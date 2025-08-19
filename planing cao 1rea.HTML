@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Paning : Légion PacaWar -1er REA-CAO</title>
+
+<!-- Favicon perso -->
+<link rel="icon" type="image/png" href="logo.png"/>
+
+<style>
+  :root{
+    --bg:#0a0a0a; --panel:#101214; --edge:#2b2b2b;
+    --ink:#f4f1e6; --muted:#b9b4a3;
+    --gold:#d4af37; --copper:#b87333;
+    --ok:#49d17d; --no:#e05a5a;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; color:var(--ink);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #171717 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 0%, #141414 0%, transparent 60%),
+      linear-gradient(180deg,#0a0a0a,#0c0c0c 50%, #090909);
+    transition: background .25s ease;
+  }
+
+  .wrap{max-width:1400px;margin:24px auto;padding:0 12px}
+
+  /* ====== ENTÊTE CENTRÉ ====== */
+  header{
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    margin-bottom:14px; text-align:center;
+  }
+  .title{
+    font-weight:1000; text-transform:uppercase; letter-spacing:.6px;
+    font-size:clamp(18px,3.8vw,28px);
+    color:transparent;
+    background:linear-gradient(90deg,var(--gold),var(--copper));
+    -webkit-background-clip:text; background-clip:text;
+  }
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+  button{
+    background:linear-gradient(180deg,#141414,#0f0f0f);
+    color:var(--ink); border:1px solid #2f2f2f;
+    padding:10px 12px; border-radius:10px; cursor:pointer; transition:.15s; font-weight:800;
+  }
+  button:hover{transform:translateY(-1px); border-color:#3b3b3b}
+  .primary{
+    color:#0b0b0b; border:none;
+    background:linear-gradient(90deg,var(--gold),var(--copper));
+    box-shadow:0 0 24px rgba(212,175,55,.16) inset, 0 0 10px rgba(212,175,55,.08);
+  }
+  .ghost{background:transparent;border:1px dashed #3a3a3a;color:var(--muted)}
+  .hidden{display:none!important}
+
+  .panel{
+    background:linear-gradient(180deg,#0f1214,#0c0e10);
+    border:1px solid var(--edge); border-radius:16px; padding:12px; margin-bottom:12px
+  }
+  .note{color:var(--muted);font-size:12px;text-align:center}
+
+  /* === Grille desktop === */
+  .grid{overflow:auto;border:1px solid var(--edge);border-radius:14px;background:linear-gradient(180deg,#0f0f10,#101112)}
+  table{width:100%;min-width:980px;border-collapse:separate;border-spacing:0}
+  thead th{
+    position:sticky;top:0;z-index:2;
+    background:linear-gradient(180deg,#1a1a1a,#121212 50%,#101010);
+    border-bottom:1px solid var(--edge);
+    color:var(--ink);font-size:12.5px;text-transform:uppercase;letter-spacing:.6px;
+    padding:10px 8px;white-space:nowrap
+  }
+  tbody th{
+    position:sticky;left:0;z-index:1;background:linear-gradient(180deg,#191919,#111);
+    border-right:1px solid var(--edge);padding:8px;text-align:center;width:110px;color:var(--muted);font-weight:900
+  }
+  tbody td{
+    border-left:1px solid #1d1d1d;border-top:1px solid #1a1a1a;
+    padding:8px;vertical-align:top;min-height:110px;
+    background:linear-gradient(180deg,rgba(212,175,55,0.045),rgba(184,115,51,0.02) 55%,transparent 100%);
+  }
+  tbody tr:nth-child(even) td{background:linear-gradient(180deg,rgba(212,175,55,.03),rgba(184,115,51,.015) 55%,transparent 100%)}
+  .cell-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .tag{font-size:10px;color:#0b0b0b;background:linear-gradient(90deg,var(--gold),var(--copper));border-radius:999px;padding:2px 6px;font-weight:900}
+
+  /* Pastilles événements */
+  .ev{display:flex;align-items:center;gap:8px;margin:8px 0 0;padding:8px 10px;border-radius:10px;background:#141618;border:1px solid #2a2d31;font-size:12px;line-height:1.25;cursor:pointer}
+  .ev:hover{border-color:#3a3f46;background:#161a1d}
+  .ev .thumb{width:30px;height:30px;min-width:30px;border-radius:6px;overflow:hidden;border:1px solid #2b2b2b;background:#0b0b0b}
+  .ev .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .ev .ttl{font-weight:900}
+  .ev .meta{color:var(--muted);font-size:11px}
+  .ev .datepill{margin-left:auto;border:1px solid #2a2a2a;background:#0f0f0f;border-radius:999px;padding:2px 6px;font-size:10px;color:#cfc9b6}
+  .ev .presence{display:flex;gap:6px;margin-left:6px}
+  .badge{font-size:10px;border-radius:999px;padding:2px 6px;border:1px solid #2a2a2a;background:#0f0f0f}
+  .badge.ok{border-color:rgba(73,209,125,.35); color:#bff0d2}
+  .badge.no{border-color:rgba(224,90,90,.35); color:#f3c3c3}
+
+  /* === Mobile list === */
+  .mobile{display:none}
+  .m-month{margin:10px 0 14px}
+  .m-hdr{display:flex;align-items:baseline;gap:8px}
+  .m-title{font-weight:1000;text-transform:uppercase;letter-spacing:.6px}
+  .m-sub{color:var(--muted);font-size:12px}
+  .m-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .m-card{border:1px solid var(--edge);border-radius:12px;padding:10px;background:linear-gradient(180deg,#141618,#111315)}
+  .m-top{display:flex;align-items:center;gap:10px}
+  .m-thumb{width:44px;height:44px;border-radius:8px;overflow:hidden;border:1px solid #2b2b2b;background:#0b0b0b}
+  .m-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .m-ttl{font-weight:900}
+  .m-meta{color:var(--muted);font-size:12px}
+  .m-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .m-pres{display:flex;gap:6px;margin-top:8px}
+  .m-btn{border:1px solid #2b2b2b;background:#0f0f0f;border-radius:10px;padding:8px 10px;cursor:pointer;font-weight:800}
+  .m-btn.ok{border-color:rgba(73,209,125,.35)}
+  .m-btn.no{border-color:rgba(224,90,90,.35)}
+
+  /* === Responsive === */
+  @media (max-width: 760px){
+    .grid{display:none}
+    .mobile{display:block}
+    .toolbar{width:100%}
+    .toolbar button{flex:1}
+    .wrap{padding:0 10px}
+  }
+
+  /* === PRINT === */
+  @media print{
+    @page{ size:A4; margin:12mm }
+    body, .wrap{background:#fff !important; color:#000 !important}
+    header .toolbar, .panel, dialog{display:none !important}
+    .grid{display:none !important}
+    .mobile{display:block !important}
+    .m-card{background:#fff;border-color:#999}
+    .m-meta, .m-sub{color:#222}
+    .m-btn{display:none}
+    .badge{border-color:#888;color:#000}
+    .m-month{break-inside:avoid}
+  }
+
+  /* ======= DLG VIEW: "ORDRE DE MISSION" + FOND ARMÉE ======= */
+  dialog{
+    border:none;border-radius:14px;padding:0;max-width:640px;width:clamp(320px,96vw,640px);
+    background:linear-gradient(180deg,#0f1113,#0b0d0f);color:var(--ink);
+    box-shadow:0 10px 36px rgba(0,0,0,.6), 0 0 0 1px #232323
+  }
+  #dlgView{
+    position:relative; overflow:hidden;
+    background:
+      repeating-linear-gradient(35deg, #0e0f10 0 28px, #162015 28px 56px, #1b1a2 56px 84px, #10161c 84px 112px);
+  }
+  #dlgView::before{content:""; position:absolute; inset:0; background:inherit; opacity:.25; pointer-events:none;}
+  .mission-banner{
+    position:relative; display:flex; align-items:center; justify-content:center; gap:10px;
+    padding:12px 14px; background:linear-gradient(90deg, rgba(0,0,0,.6), rgba(0,0,0,.2), rgba(0,0,0,.6));
+    border-bottom:1px solid #242424;
+  }
+  .mission-title{font-weight:1000; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); text-shadow:0 0 12px rgba(212,175,55,.2);}
+  .mission-flag{display:flex;gap:4px;align-items:center}
+  .mission-flag span{width:8px;height:16px;display:inline-block;border-radius:2px}
+  .flag-be-black{background:#000}
+  .flag-be-yellow{background:#ffd90c}
+  .flag-be-red{background:#ef2a2a}
+  .dlg-head{position:relative; z-index:1; background:transparent}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">Paning : Légion PacaWar -1er REA-CAO</div>
+      <div class="toolbar">
+        <button id="btnLogin">Connexion</button>
+        <button id="btnLogout" class="hidden">Quitter</button>
+        <button id="btnExport">Exporter JSON</button>
+
+        <!-- Importer JSON : visible seulement pour admin -->
+        <span id="importWrap" class="hidden">
+          <label class="ghost" for="importFile">Importer JSON</label>
+          <input id="importFile" type="file" accept="application/json" class="hidden"/>
+        </span>
+
+        <button id="btnGoogle" class="primary">Agenda Google</button>
+        <button id="btnPrint">Imprimer</button>
+        <!-- Paramètres caché par défaut (admin uniquement) -->
+        <button id="btnSettings" class="hidden">Paramètres</button>
+      </div>
+    </header>
+
+    <section class="panel"><div class="note">Public : cliquer un événement ➜ vote <b>Présent</b> / <b>Pas présent</b>. Admin : cliquer une case ➜ créer/modifier.</div></section>
+
+    <!-- Desktop grid -->
+    <section class="grid">
+      <table id="tbl">
+        <thead>
+          <tr id="hdr"><th>WEEK-END</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
+    <!-- Mobile list -->
+    <section class="mobile" id="mobileList"></section>
+  </div>
+
+  <!-- Login -->
+  <dialog id="dlgLogin">
+    <form method="dialog">
+      <div class="dlg-head"><strong>Connexion</strong><button value="cancel" class="ghost">✕</button></div>
+      <div class="dlg-body">
+        <div class="form">
+          <div style="grid-column:1/-1"><label>Code d’accès</label><input id="adminCodeInput" type="password" placeholder="Entrer le code"/></div>
+        </div>
+      </div>
+      <div class="actions"><button class="ghost" value="cancel">Annuler</button><button id="btnDoLogin" class="primary" value="confirm">Se connecter</button></div>
+    </form>
+  </dialog>
+
+  <!-- Éditeur -->
+  <dialog id="dlgEvent">
+    <form id="eventForm" method="dialog">
+      <div class="dlg-head"><strong id="dlgEventTitle">Nouvel événement</strong><button value="cancel" class="ghost">✕</button></div>
+      <div class="dlg-body">
+        <div class="form">
+          <div style="grid-column:1/-1"><label>Titre</label><input id="f_title" required placeholder="Ex : 1RE AIRSOFT"/></div>
+          <div><label>Heure début</label><input id="f_start" type="time"/></div>
+          <div><label>Heure fin</label><input id="f_end" type="time"/></div>
+          <div style="grid-column:1/-1"><label>Lieu</label><input id="f_place" placeholder="Ex : 83910 Pourrières, France"/></div>
+          <div style="grid-column:1/-1"><label>Notes</label><textarea id="f_notes" placeholder="Consignes, matériel..."></textarea></div>
+          <div><label>Couleur</label><select id="f_color"><option value="gold">Or</option><option value="copper" selected>Cuivré</option><option value="dark">Sombre</option></select></div>
+          <div style="grid-column:1/-1"><label>Image / Affiche</label><input id="f_img" type="file" accept="image/*"/><div id="imgPreview" style="margin-top:8px"></div></div>
+          <div style="grid-column:1/-1"><label>Date (YYYY-MM-DD)</label><input id="f_date" type="date"/></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btnDelete" class="ghost hidden" value="delete">Supprimer</button>
+        <button class="ghost" value="cancel">Fermer</button>
+        <button id="btnSave" class="primary" value="confirm">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Viewer + ORDRE DE MISSION -->
+  <dialog id="dlgView">
+    <div class="mission-banner">
+      <div class="mission-flag">
+        <span class="flag-be-black"></span><span class="flag-be-yellow"></span><span class="flag-be-red"></span>
+      </div>
+      <div class="mission-title">ORDRE DE MISSION</div>
+      <div class="mission-flag">
+        <span class="flag-be-black"></span><span class="flag-be-yellow"></span><span class="flag-be-red"></span>
+      </div>
+    </div>
+
+    <div class="dlg-head"><strong id="v_title">Titre</strong><button id="v_close" class="ghost" value="cancel">✕</button></div>
+    <div class="dlg-body">
+      <div id="v_imgWrap" style="margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+        <div class="badge" id="v_date"></div>
+        <div class="badge" id="v_time"></div>
+        <div class="badge" id="v_place"></div>
+      </div>
+      <div style="white-space:pre-wrap" id="v_notes"></div>
+      <div id="presenceBar" style="display:flex;gap:8px;align-items:center;margin-top:12px">
+        <span class="note">Présence :</span>
+        <button id="btnPresent" class="ghost">Présent</button>
+        <button id="btnAbsent" class="ghost">Pas présent</button>
+        <span id="presenceSummary" class="badge" style="margin-left:auto"></span>
+      </div>
+    </div>
+    <div class="actions"><button id="v_ok">Fermer</button></div>
+  </dialog>
+
+  <!-- Paramètres (admin) -->
+  <dialog id="dlgSettings">
+    <form method="dialog">
+      <div class="dlg-head"><strong>Paramètres</strong><button id="s_close" value="cancel" class="ghost">✕</button></div>
+      <div class="dlg-body">
+        <div class="form">
+
+          <div style="grid-column:1/-1"><label>Nouveau code d’accès</label><input id="set_adminCode" type="password" placeholder="Laisser vide pour conserver"/></div>
+
+          <div style="grid-column:1/-1"><hr style="border:none;border-top:1px solid #2b2b2b;margin:8px 0"/></div>
+
+          <!-- Fond d'écran (planning complet) -->
+          <div style="grid-column:1/-1"><label>Fond d’écran (image)</label><input id="set_planning_bg" type="file" accept="image/*"/></div>
+          <div><label>Couleur de fond</label><input id="set_planning_color" type="color" value="#0a0a0a"/></div>
+          <div><label>&nbsp;</label><button id="btnClearPlanningBg" class="ghost">Retirer fond</button></div>
+
+          <div style="grid-column:1/-1"><hr style="border:none;border-top:1px solid #2b2b2b;margin:8px 0"/></div>
+
+          <!-- Fond Ordre de mission -->
+          <div style="grid-column:1/-1">
+            <label>Fond “Ordre de mission” (image)</label>
+            <input id="set_bg" type="file" accept="image/*"/>
+            <div class="note">Optionnel : téléverse ton fond (stocké localement).</div>
+          </div>
+          <div style="grid-column:1/-1">
+            <button id="btnClearBg" class="ghost">Retirer fond “Ordre de mission”</button>
+          </div>
+
+        </div>
+      </div>
+      <div class="actions"><button class="ghost" value="cancel">Annuler</button><button id="btnSaveSettings" class="primary" value="confirm">Enregistrer</button></div>
+    </form>
+  </dialog>
+
+  <!-- Google Agenda -->
+  <dialog id="dlgGoogle">
+    <div class="dlg-head"><strong>Ajouter à Google Agenda</strong><button id="g_close" class="ghost" value="cancel">✕</button></div>
+    <div class="dlg-body">
+      <label class="note">Événement</label>
+      <select id="g_event" style="width:100%;padding:10px;border-radius:10px;border:1px solid #2b2b2b;background:#0a0b0c;color:var(--ink);margin-bottom:10px"></select>
+      <label class="note">Date (si non renseignée)</label>
+      <input id="g_date" type="date" style="width:100%;padding:10px;border-radius:10px;border:1px solid #2b2b2b;background:#0a0b0c;color:var(--ink)"/>
+    </div>
+    <div class="actions"><button class="ghost" id="g_cancel">Annuler</button><button class="primary" id="g_submit">Ouvrir Google Agenda</button></div>
+  </dialog>
+
+<script>
+(() => {
+  // --- Keys ---
+  const LS_KEY='legion_planning_v5';
+  const LS_ADMIN='legion_admin_code';
+  const SESSION='legion_admin_on';
+  const LS_VOTES='legion_votes_v1';
+
+  const LS_MISSION_BG='legion_mission_bg';     // image pour la fenêtre Ordre de mission
+  const LS_PLAN_BG_IMG='legion_plan_bg_img';   // image de fond d’écran
+  const LS_PLAN_BG_COL='legion_plan_bg_col';   // couleur de fond d’écran
+
+  // --- Grid config ---
+  const MONTHS=['Septembre','Octobre','Novembre','Décembre','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août'];
+  const ROWS=4;
+
+  // --- Shorthands ---
+  const $=id=>document.getElementById(id);
+  const els={
+    hdr:$('hdr'), tbody:$('tbody'), mobileList:$('mobileList'),
+    btnLogin:$('btnLogin'), btnLogout:$('btnLogout'),
+    btnExport:$('btnExport'), importWrap:$('importWrap'), importFile:$('importFile'),
+    btnSettings:$('btnSettings'), btnPrint:$('btnPrint'),
+    btnGoogle:$('btnGoogle'),
+    dlgLogin:$('dlgLogin'), adminCodeInput:$('adminCodeInput'),
+    dlgEvent:$('dlgEvent'), dlgEventTitle:$('dlgEventTitle'),
+    f_title:$('f_title'), f_start:$('f_start'), f_end:$('f_end'), f_place:$('f_place'), f_notes:$('f_notes'), f_color:$('f_color'),
+    f_img:$('f_img'), imgPreview:$('imgPreview'), f_date:$('f_date'),
+    btnDelete:$('btnDelete'), btnSave:$('btnSave'),
+    dlgView:$('dlgView'), v_title:$('v_title'), v_time:$('v_time'), v_place:$('v_place'), v_notes:$('v_notes'), v_imgWrap:$('v_imgWrap'), v_date:$('v_date'),
+    btnPresent:$('btnPresent'), btnAbsent:$('btnAbsent'), presenceSummary:$('presenceSummary'), v_ok:$('v_ok'), v_close:$('v_close'),
+    dlgSettings:$('dlgSettings'), set_adminCode:$('set_adminCode'),
+    set_planning_bg:$('set_planning_bg'), set_planning_color:$('set_planning_color'), btnClearPlanningBg:$('btnClearPlanningBg'),
+    set_bg:$('set_bg'), btnClearBg:$('btnClearBg'), btnSaveSettings:$('btnSaveSettings'),
+    dlgGoogle:$('dlgGoogle'), g_event:$('g_event'), g_date:$('g_date'), g_submit:$('g_submit'), g_close:$('g_close'), g_cancel:$('g_cancel'),
+  };
+
+  // --- State ---
+  let state={editingKey:null, editingId:null, viewingEvent:null};
+
+  // --- Storage helpers ---
+  const load = ()=>{ try{return JSON.parse(localStorage.getItem(LS_KEY))||{events:[]};}catch{return {events:[]};} };
+  const save = (d)=> localStorage.setItem(LS_KEY, JSON.stringify(d));
+  const uid  = ()=>'e_'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+  const getCode = ()=> localStorage.getItem(LS_ADMIN) || 'LEGION2025';
+  const setCode = (v)=> v && localStorage.setItem(LS_ADMIN, v);
+  const isAdmin = ()=> sessionStorage.getItem(SESSION)==='1';
+  const setAdmin= (on)=>{ on?sessionStorage.setItem(SESSION,'1'):sessionStorage.removeItem(SESSION); refreshUI(); };
+  const getVotes= ()=> { try{return JSON.parse(localStorage.getItem(LS_VOTES))||{};}catch{return {};} };
+  const setVotes= (v)=> localStorage.setItem(LS_VOTES, JSON.stringify(v));
+  const fmtDate = (iso)=> iso? new Date(iso).toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'short',year:'numeric'}):'';
+  const enc = (s)=> encodeURIComponent(s).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16));
+
+  // --- Background helpers ---
+  function applyPlanningBackground(){
+    const img = localStorage.getItem(LS_PLAN_BG_IMG);
+    const col = localStorage.getItem(LS_PLAN_BG_COL) || '#0a0a0a';
+    if(img){
+      document.body.style.background = `url(${img}) center/cover fixed, ${col}`;
+    }else{
+      document.body.style.background =
+        `radial-gradient(1200px 600px at 10% -10%, #171717 0%, transparent 60%),
+         radial-gradient(1000px 500px at 110% 0%, #141414 0%, transparent 60%),
+         linear-gradient(180deg, ${col}, #0c0c0c 50%, #090909)`;
+    }
+  }
+  function applyMissionBackground(){
+    const bg = localStorage.getItem(LS_MISSION_BG);
+    els.dlgView.style.backgroundImage = '';
+    els.dlgView.style.backgroundSize = '';
+    els.dlgView.style.backgroundPosition = '';
+    els.dlgView.style.backgroundRepeat = '';
+    if(bg){
+      els.dlgView.style.backgroundImage = `url(${bg})`;
+      els.dlgView.style.backgroundSize = 'cover';
+      els.dlgView.style.backgroundPosition = 'center';
+      els.dlgView.style.backgroundRepeat = 'no-repeat';
+    }
+  }
+
+  // --- Build grid ---
+  function buildHeader(){
+    els.hdr.innerHTML=''; const th=document.createElement('th'); th.textContent='WEEK-END'; els.hdr.appendChild(th);
+    MONTHS.forEach(m=>{ const th=document.createElement('th'); th.textContent=m; els.hdr.appendChild(th); });
+  }
+  function buildBody(){
+    els.tbody.innerHTML='';
+    for(let r=1;r<=ROWS;r++){
+      const tr=document.createElement('tr'); const lh=document.createElement('th'); lh.textContent=r; tr.appendChild(lh);
+      for(let mIdx=0;mIdx<MONTHS.length;mIdx++){
+        const td=document.createElement('td'); td.dataset.m=mIdx; td.dataset.r=r;
+        const head=document.createElement('div'); head.className='cell-head';
+        const tag=document.createElement('div'); tag.className='tag'; tag.textContent=MONTHS[mIdx];
+        head.appendChild(document.createElement('span')); head.appendChild(tag); td.appendChild(head);
+        td.addEventListener('click', e=>{ if(isAdmin()) openEditor({mIdx,r}, null); });
+        tr.appendChild(td);
+      }
+      els.tbody.appendChild(tr);
+    }
+  }
+
+  // --- Render desktop & mobile ---
+  function render(){
+    document.querySelectorAll('#tbody td').forEach(td=>[...td.querySelectorAll('.ev')].forEach(n=>n.remove()));
+    const data=load();
+    for(const e of data.events){
+      const td=document.querySelector(`#tbody td[data-m="${e.mIdx}"][data-r="${e.r}"]`); if(!td) continue;
+      const pill=document.createElement('div'); pill.className='ev'; pill.dataset.id=e.id;
+
+      const thumb=document.createElement('div'); thumb.className='thumb';
+      if(e.img){ const im=new Image(); im.src=e.img; thumb.appendChild(im); }
+      pill.appendChild(thumb);
+
+      const box=document.createElement('div');
+      const ttl=document.createElement('div'); ttl.className='ttl'; ttl.textContent=e.title; box.appendChild(ttl);
+      const meta=document.createElement('div'); meta.className='meta';
+      meta.textContent=(e.start||'')+(e.end?(' → '+e.end):'')+(e.place?((e.start||e.end)?' · ':'')+e.place:'');
+      box.appendChild(meta); pill.appendChild(box);
+
+      if(e.date){ const dp=document.createElement('div'); dp.className='datepill'; dp.textContent=fmtDate(e.date); pill.appendChild(dp); }
+
+      const pres=document.createElement('div'); pres.className='presence';
+      const b1=document.createElement('span'); b1.className='badge ok'; b1.textContent=`Présents ${e.present||0}`;
+      const b2=document.createElement('span'); b2.className='badge no'; b2.textContent=`Pas présents ${e.absent||0}`;
+      pres.appendChild(b1); pres.appendChild(b2); pill.appendChild(pres);
+
+      if(e.color==='gold') pill.style.boxShadow='inset 0 0 0 1px rgba(212,175,55,.35)';
+      if(e.color==='copper') pill.style.boxShadow='inset 0 0 0 1px rgba(184,115,51,.35)';
+
+      pill.addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        if(isAdmin()) openEditor({mIdx:e.mIdx, r:e.r}, e);
+        else openViewer(e);
+      });
+
+      td.appendChild(pill);
+    }
+    refreshUI();
+    renderMobile();
+  }
+
+  function renderMobile(){
+    const data=load();
+    const groups=MONTHS.map((name,idx)=>({name,idx,items:[]}));
+    for(const e of data.events){ if(groups[e.mIdx]) groups[e.mIdx].items.push(e); }
+    groups.forEach(g=>g.items.sort((a,b)=> (a.r-b.r)||a.title.localeCompare(b.title,'fr')));
+    els.mobileList.innerHTML='';
+    groups.forEach(g=>{
+      const section=document.createElement('div'); section.className='m-month';
+      const hdr=document.createElement('div'); hdr.className='m-hdr';
+      const t=document.createElement('div'); t.className='m-title'; t.textContent=g.name;
+      const sub=document.createElement('div'); sub.className='m-sub'; sub.textContent=g.items.length?`${g.items.length} événement(s)`:'Aucun événement';
+      hdr.appendChild(t); hdr.appendChild(sub); section.appendChild(hdr);
+
+      const list=document.createElement('div'); list.className='m-list';
+      g.items.forEach(e=>{
+        const card=document.createElement('div'); card.className='m-card'; card.dataset.id=e.id;
+
+        const top=document.createElement('div'); top.className='m-top';
+        const th=document.createElement('div'); th.className='m-thumb';
+        if(e.img){ const im=new Image(); im.src=e.img; th.appendChild(im); }
+        top.appendChild(th);
+
+        const mid=document.createElement('div');
+        const ttl=document.createElement('div'); ttl.className='m-ttl'; ttl.textContent=e.title; mid.appendChild(ttl);
+        const meta=document.createElement('div'); meta.className='m-meta';
+        meta.textContent=(e.date?fmtDate(e.date)+' · ':'')+(e.start?e.start:'')+(e.end?(' → '+e.end):'')+(e.place?((e.start||e.end||e.date)?' · ':'')+e.place:'');
+        mid.appendChild(meta);
+        top.appendChild(mid);
+
+        card.appendChild(top);
+
+        const badges=document.createElement('div'); badges.className='m-badges';
+        const b1=document.createElement('span'); b1.className='badge ok'; b1.textContent=`Présents ${e.present||0}`;
+        const b2=document.createElement('span'); b2.className='badge no'; b2.textContent=`Pas présents ${e.absent||0}`;
+        badges.appendChild(b1); badges.appendChild(b2);
+        card.appendChild(badges);
+
+        if(!isAdmin()){
+          const pres=document.createElement('div'); pres.className='m-pres';
+          const pBtn=document.createElement('button'); pBtn.className='m-btn ok'; pBtn.textContent='Présent';
+          const aBtn=document.createElement('button'); aBtn.className='m-btn no'; aBtn.textContent='Pas présent';
+          pBtn.addEventListener('click',(ev)=>{ ev.preventDefault(); vote(e.id,'present'); });
+          aBtn.addEventListener('click',(ev)=>{ ev.preventDefault(); vote(e.id,'absent'); });
+          pres.appendChild(pBtn); pres.appendChild(aBtn);
+          card.appendChild(pres);
+          card.addEventListener('click',(ev)=>{ if(ev.target===pBtn||ev.target===aBtn) return; openViewer(e); });
+        }else{
+          card.addEventListener('click', ()=> openEditor({mIdx:e.mIdx,r:e.r}, e));
+        }
+
+        list.appendChild(card);
+      });
+
+      section.appendChild(list);
+      els.mobileList.appendChild(section);
+    });
+  }
+
+  // --- UI toggle (admin only for import/settings) ---
+  function refreshUI(){
+    els.btnLogin.classList.toggle('hidden', isAdmin());
+    els.btnLogout.classList.toggle('hidden', !isAdmin());
+    els.btnSettings.classList.toggle('hidden', !isAdmin());
+    els.importWrap.classList.toggle('hidden', !isAdmin()); // Importer JSON interdit aux non-admin
+  }
+
+  // --- Editor ---
+  function openEditor(key, ev){
+    state.editingKey=key; state.editingId=ev?ev.id:null;
+    els.dlgEventTitle.textContent=ev? 'Modifier l’événement' : `Nouvel événement — ${MONTHS[key.mIdx]} • ligne ${key.r}`;
+    els.f_title.value=ev?.title||''; els.f_start.value=ev?.start||''; els.f_end.value=ev?.end||'';
+    els.f_place.value=ev?.place||''; els.f_notes.value=ev?.notes||''; els.f_color.value=ev?.color||'copper';
+    els.f_date.value=ev?.date||''; els.f_img.value=''; els.imgPreview.innerHTML=ev?.img?`<div class="thumb"><img src="${ev.img}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid #2b2b2b"/></div>`:'';
+    els.btnDelete.classList.toggle('hidden', !ev);
+    els.dlgEvent.showModal();
+  }
+
+  els.f_img.addEventListener('change', ()=>{
+    const f=els.f_img.files[0]; if(!f){els.imgPreview.innerHTML=''; return;}
+    const fr=new FileReader(); fr.onload=()=>{ els.imgPreview.innerHTML=`<div class="thumb"><img src="${fr.result}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid #2b2b2b"/></div>`; }; fr.readAsDataURL(f);
+  });
+
+  els.btnSave.addEventListener('click', (ev)=>{
+    ev.preventDefault();
+    const data=load();
+    const prev = state.editingId? data.events.find(x=>x.id===state.editingId) : null;
+    const rec={
+      id: state.editingId || uid(),
+      mIdx: state.editingKey.mIdx, r: state.editingKey.r,
+      title: els.f_title.value.trim(),
+      start: els.f_start.value || null, end: els.f_end.value || null,
+      place: els.f_place.value.trim() || null, notes: els.f_notes.value.trim() || null,
+      color: els.f_color.value || 'copper',
+      img: prev?.img || null,
+      date: els.f_date.value || null,
+      present: prev?.present || 0, absent: prev?.absent || 0
+    };
+    if(!rec.title){ alert('Titre requis.'); return; }
+
+    const file=els.f_img.files[0];
+    const finish=()=>{
+      const i=data.events.findIndex(x=>x.id===rec.id);
+      if(i>=0) data.events[i]=rec; else data.events.push(rec);
+      save(data); els.dlgEvent.close(); render();
+    };
+    if(file){ const fr=new FileReader(); fr.onload=()=>{ rec.img=fr.result; finish(); }; fr.readAsDataURL(file); }
+    else finish();
+  });
+
+  els.btnDelete.addEventListener('click', (ev)=>{
+    ev.preventDefault(); if(!state.editingId) return;
+    const data=load(); const idx=data.events.findIndex(x=>x.id===state.editingId); if(idx<0) return;
+    const votes=getVotes(); delete votes[data.events[idx].id]; setVotes(votes);
+    data.events.splice(idx,1); save(data); els.dlgEvent.close(); render();
+  });
+
+  // --- Viewer & voting ---
+  function openViewer(e){
+    state.viewingEvent=e;
+    applyMissionBackground();
+    els.v_title.textContent=e.title;
+    els.v_time.textContent = (e.start? e.start : '--:--') + (e.end? ' → '+e.end : '');
+    els.v_place.textContent = e.place || '—';
+    els.v_notes.textContent = e.notes || '—';
+    els.v_imgWrap.innerHTML = e.img? `<div class="thumb" style="width:120px;height:120px;border-radius:10px"><img src="${e.img}" style="width:100%;height:100%;object-fit:cover"/></div>` : '';
+    els.v_date.textContent = e.date? fmtDate(e.date) : 'Date non renseignée';
+    $('presenceBar').classList.toggle('hidden', isAdmin());
+    updatePresenceSummary();
+    els.dlgView.showModal();
+  }
+  function updatePresenceSummary(){
+    const data=load();
+    const ev = data.events.find(x=>x.id===state.viewingEvent.id);
+    els.presenceSummary.textContent = `Présents ${ev?.present||0} — Pas présents ${ev?.absent||0}`;
+  }
+  els.v_ok.addEventListener('click', ()=> els.dlgView.close());
+  els.v_close.addEventListener('click', ()=> els.dlgView.close());
+
+  function vote(eventId, choice){
+    const votes=getVotes(); const data=load(); const e=data.events.find(x=>x.id===eventId); if(!e) return;
+    e.present = e.present||0; e.absent = e.absent||0;
+    const prev=votes[eventId]||null;
+    if(prev!==choice){
+      if(prev==='present') e.present=Math.max(0,e.present-1);
+      if(prev==='absent')  e.absent =Math.max(0,e.absent-1);
+      if(choice==='present') e.present+=1; else e.absent+=1;
+      votes[eventId]=choice; setVotes(votes); save(data); render();
+      if(state.viewingEvent && state.viewingEvent.id===eventId) updatePresenceSummary();
+    }
+  }
+  els.btnPresent.addEventListener('click', ()=>{ if(state.viewingEvent && !isAdmin()) vote(state.viewingEvent.id,'present'); });
+  els.btnAbsent .addEventListener('click', ()=>{ if(state.viewingEvent && !isAdmin()) vote(state.viewingEvent.id,'absent'); });
+
+  // --- Login / settings ---
+  $('btnDoLogin').addEventListener('click',(e)=>{ 
+    e.preventDefault(); 
+    if(els.adminCodeInput.value===getCode()){ setAdmin(true); els.dlgLogin.close(); } 
+    else alert('Code incorrect.'); 
+  });
+  $('btnLogin').addEventListener('click', ()=>{ els.adminCodeInput.value=''; els.dlgLogin.showModal(); });
+  $('btnLogout').addEventListener('click', ()=> setAdmin(false));
+
+  $('btnSettings').addEventListener('click', ()=>{ 
+    els.set_adminCode.value=''; 
+    els.set_planning_bg.value=''; 
+    els.set_planning_color.value = localStorage.getItem(LS_PLAN_BG_COL) || '#0a0a0a';
+    els.set_bg.value='';
+    els.dlgSettings.showModal(); 
+  });
+
+  // Efface fonds
+  els.btnClearPlanningBg.addEventListener('click', (e)=>{ e.preventDefault(); localStorage.removeItem(LS_PLAN_BG_IMG); applyPlanningBackground(); alert('Fond d’écran retiré.'); });
+  els.btnClearBg.addEventListener('click', (e)=>{ e.preventDefault(); localStorage.removeItem(LS_MISSION_BG); alert('Fond “Ordre de mission” retiré.'); });
+
+  // Sauvegarde paramètres
+  els.btnSaveSettings.addEventListener('click', (e)=>{
+    e.preventDefault();
+    const v=els.set_adminCode.value.trim();
+    if(v){ setCode(v); alert('Code d’accès mis à jour.'); }
+
+    const col = els.set_planning_color.value || '#0a0a0a';
+    localStorage.setItem(LS_PLAN_BG_COL, col);
+
+    const fp = els.set_planning_bg.files[0];
+    if(fp){
+      const fr=new FileReader();
+      fr.onload=()=>{ localStorage.setItem(LS_PLAN_BG_IMG, fr.result); applyPlanningBackground(); };
+      fr.readAsDataURL(fp);
+    }else{
+      applyPlanningBackground();
+    }
+
+    const f=els.set_bg.files[0];
+    if(f){
+      const fr=new FileReader();
+      fr.onload=()=>{ localStorage.setItem(LS_MISSION_BG, fr.result); alert('Fond “Ordre de mission” enregistré.'); };
+      fr.readAsDataURL(f);
+    }
+    els.dlgSettings.close();
+  });
+
+  // --- Import / Export ---
+  els.btnExport.addEventListener('click', ()=>{
+    const blob=new Blob([JSON.stringify(load(),null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='planning_legion.json'; a.click(); URL.revokeObjectURL(a.href);
+  });
+  els.importFile.addEventListener('change', (ev)=>{
+    const f=ev.target.files[0]; if(!f) return;
+    const fr=new FileReader();
+    fr.onload=()=>{ try{ const data=JSON.parse(fr.result); if(!data||!Array.isArray(data.events)) throw 0; save(data); render(); alert('Import réussi.'); }catch{ alert('Fichier invalide.'); } };
+    fr.readAsText(f);
+  });
+
+  // --- Google Agenda ---
+  function toGCalDT(dateStr, hm){
+    const t = dateStr? new Date(dateStr) : new Date();
+    const Y=t.getFullYear(), M=String(t.getMonth()+1).padStart(2,'0'), D=String(t.getDate()).padStart(2,'0');
+    let h=9,m=0; if(hm && /^\d{2}:\d{2}$/.test(hm)){ h=+hm.slice(0,2); m=+hm.slice(3,5); }
+    return `${Y}${M}${D}T${String(h).padStart(2,'0')}${String(m).padStart(2,'0')}00`;
+  }
+  $('btnGoogle').addEventListener('click', ()=>{
+    const data=load(); els.g_event.innerHTML='';
+    if(!data.events.length){ const o=document.createElement('option'); o.value=''; o.textContent='Aucun événement'; els.g_event.appendChild(o); }
+    else{
+      data.events.forEach(e=>{ const o=document.createElement('option'); o.value=e.id; o.textContent=`${e.title} — ${MONTHS[e.mIdx]} • ligne ${e.r}`; els.g_event.appendChild(o); });
+      els.g_event.value = data.events[0].id;
+    }
+    const ev = (load().events||[]).find(x=>x.id===els.g_event.value);
+    els.g_date.value = ev?.date || new Date().toISOString().slice(0,10);
+    els.g_event.onchange = ()=>{ const ev2=(load().events||[]).find(x=>x.id===els.g_event.value); els.g_date.value = ev2?.date || new Date().toISOString().slice(0,10); };
+    els.dlgGoogle.showModal();
+  });
+  els.g_submit.addEventListener('click', ()=>{
+    const data=load(); const ev = data.events.find(x=>x.id===els.g_event.value); if(!ev){ alert('Introuvable.'); return; }
+    const date = ev.date || els.g_date.value; if(!date){ alert('Choisis une date.'); return; }
+    const start=toGCalDT(date, ev.start||'09:00'); const end=toGCalDT(date, ev.end||ev.start||'10:00');
+    const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${enc(ev.title)}&dates=${start}/${end}&details=${enc(ev.notes||'')}&location=${enc(ev.place||'')}&sf=true&output=xml`;
+    window.open(url,'_blank'); els.dlgGoogle.close();
+  });
+  els.g_close.addEventListener('click', ()=> els.dlgGoogle.close());
+  els.g_cancel.addEventListener('click', ()=> els.dlgGoogle.close());
+
+  // --- Print ---
+  $('btnPrint').addEventListener('click', ()=> window.print());
+
+  // --- Seed (événements init) ---
+  (function seed(){
+    const data=load(); if(data.events.length) return;
+    const push=(mIdx,r,title,place,dateISO)=> data.events.push({id:uid(), mIdx, r, title, start:null, end:null, place, notes:null, color:'copper', img:null, date:dateISO, present:0, absent:0});
+    // Septembre 2025
+    push(0,3,'1REC AIRSOFT','Carpiagne, Marseille, France','2025-09-21');
+    // Octobre 2025
+    push(1,1,'1RE AIRSOFT','83910 Pourrières, France','2025-10-05');
+    push(1,3,'1REC AIRSOFT','Carpiagne, Marseille, France','2025-10-19');
+    // Novembre 2025
+    push(2,1,'1RE AIRSOFT','83910 Pourrières, France','2025-11-02');
+    push(2,3,'1RE AIRSOFT','83910 Pourrières, France','2025-11-16');
+    push(2,4,'1REC AIRSOFT','Carpiagne, Marseille, France','2025-11-23');
+    // Décembre 2025
+    push(3,2,'1REC AIRSOFT','Carpiagne, Marseille, France','2025-12-14');
+    push(3,4,'1RE AIRSOFT','83910 Pourrières, France','2025-12-28');
+    save(data);
+  })();
+
+  // --- Init ---
+  function init(){
+    buildHeader(); buildBody(); applyPlanningBackground(); render(); refreshUI();
+    // (Correction) : pas de double-binding ici, les boutons Fermer du viewer sont déjà câblés plus haut
+  }
+  init();
+})();
+</script>
+</body>
+</html>
